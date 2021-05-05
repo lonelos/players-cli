@@ -59,7 +59,13 @@ def get_dict(filename):
 
 def get_resource(id):
     dict = get_dict(INDIVIDUAL_FILE)
-    resp = requests.get(resource_url(id))
+
+    try:
+        resp = requests.get(resource_url(id))
+    except requests.exceptions.RequestException:
+        print("Error while connecting to the endpoint", resource_url(id))
+        exit(1)
+
     update_resource(dict, resp.json())
     dict['last_fetched'] = str(datetime.datetime.utcnow())
     with open(INDIVIDUAL_FILE, 'w') as outfile:
@@ -68,7 +74,13 @@ def get_resource(id):
 
 def get_all_resources():
     dict = get_dict(ALL_FILE)
-    resp = requests.get(resources_url())
+
+    try:
+        resp = requests.get(resources_url())
+    except requests.exceptions.RequestException:
+        print("Error while connecting to the endpoint:", resources_url())
+        exit(1)
+
     for resource in resp.json():
         update_resource(dict, resource)
     dict['last_fetched'] = str(datetime.datetime.utcnow())
